@@ -135,12 +135,15 @@ function iniciarApp() {
         // Botones favorito y cerrar
         const btnFavorito = document.createElement('BUTTON');
         btnFavorito.classList.add('btn', 'btn-danger', 'col');
-        btnFavorito.textContent = 'Guardar Favorito';
+        btnFavorito.textContent = existeStorage(idMeal) ? 'Elminar Favorito' : 'Guardar Favorito';
 
         // LocalStorage
         btnFavorito.onclick = function() {
 
             if(existeStorage(idMeal)) {
+                eliminarFavorito(idMeal);
+                btnFavorito.textContent = 'Guargar Favorito';
+                mostrarToast('ELminado Correctamente');
                 return
             }
             
@@ -149,6 +152,8 @@ function iniciarApp() {
                 titulo: strMeal,
                 img: strMealThumb
             });
+            btnFavorito.textContent = 'Elminar Favorito';
+            mostrarToast('Agregado Correctamente');
         }
 
         const btnCerrarModal = document.createElement('BUTTON');
@@ -170,9 +175,23 @@ function iniciarApp() {
         localStorage.setItem('favoritos', JSON.stringify([...favoritos, receta]));
     }
 
+    function eliminarFavorito(id) {
+        const favoritos = JSON.parse(localStorage.getItem('favoritos')) ?? [];
+        const nuevoFavorito = favoritos.filter(favorito => favorito.id !== id);
+        localStorage.setItem('favoritos', JSON.stringify(nuevoFavorito));
+    }
+
     function existeStorage(id) {
         const favoritos = JSON.parse(localStorage.getItem('favoritos')) ?? [];
         return favoritos.some(favorito => favorito.id === id);
+    }
+
+    function mostrarToast(mensaje) {
+        const toastDiv = document.querySelector('#toast');
+        const toastBody = document.querySelector('.toast-body');
+        const toast = new bootstrap.Toast(toastDiv);
+        toastBody.textContent = mensaje;
+        toast.show();
     }
 
     function limpiarHTML(selector) {
